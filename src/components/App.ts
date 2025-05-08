@@ -1,5 +1,4 @@
-import {createNodes} from "./createsNode";
-import {createTree} from "./createTree";
+import {Tree} from "./CreateTree";
 
 interface IApp {
   form: HTMLFormElement;
@@ -47,12 +46,13 @@ export class App implements IApp {
   init() {
     let nodes = null
     this.inputValue();
+    const tree = new Tree();
     this.form.addEventListener("submit", (evt) => {
      evt.preventDefault();
       const formData = new FormData(this.form)
       if(this.validate(formData.get('tree') as string)){
-        nodes = createNodes(formData.get('tree') as string);
-        this.sectionRender.innerHTML = createTree(nodes)
+        nodes = tree.createNodes(formData.get('tree') as string);
+        this.sectionRender.innerHTML = tree.createTree(nodes)
       }
     })
   }
