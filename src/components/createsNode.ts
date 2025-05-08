@@ -1,31 +1,31 @@
-export function createNodes(str: string) {
-  const nodes = [];
+interface Node {
+  value: string;
+  level: number;
+  index: number;
+}
+export function createNodes(str: string): Node[] {
+  const nodes: Node[] = [];
+  let level = -1;
+  let buffer = "";
+  let index = 0;
 
-  let currentLevel = -1;
-  let currentValueNumber = "";
-  let currentIndex = 0;
-
-  for (let i = 0; i < str.length; i++) {
-    if (str[i] === "(" || str[i] === ")" || str[i] === " ") {
-      if (currentValueNumber) {
-        const node = {
-          value: currentValueNumber,
-          level: currentLevel,
-          index: currentIndex,
-        };
-
-        nodes.push(node);
-
-        currentValueNumber = "";
-        currentIndex++;
-      }
-
-      if (str[i] === "(") currentLevel++;
-      if (str[i] === ")") currentLevel--;
+  for (const char of str) {
+    if (char === "(") {
+      level++;
     }
-    else {
-      currentValueNumber += str[i];
+
+    if (char === ")" || char === " ") {
+      if (buffer) {
+        nodes.push({ value: buffer, level, index: index++ });
+        buffer = "";
+      }
+      if (char === ")") {
+        level--;
+      }
+    } else if (char !== "(") {
+      buffer += char;
     }
   }
+
   return nodes;
 }

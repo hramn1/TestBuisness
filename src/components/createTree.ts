@@ -1,80 +1,72 @@
-export function createTree(nodes) {
-  let tree = ``; // Дерево
-  const maxValuesLengthOnLevel = []; // Массив из максимальных количеств символов числа на каждом уровне
-  const verticalLinePositions = []; // Текущии позиции вертикальных линий в строке
-  const levels = Array.from(new Set(nodes.map((item) => item.level))); // Все уровни из исходных данных
+interface Node {
+  value: string;
+  level: number;
+  index: number;
+}
 
-  // Получаем максимальные количеств символов числа на каждом уровне
-  for (let i = 0; i < levels.length; i++) {
-    const value = nodes
-      .filter((item) => item.level === levels[i])
-      .map((item) => item.value)
-      .sort((a, b) => b.length - a.length)[0].length;
+export function createTree(nodes: Node[]): string {
+  let tree = '';
+  const maxValuesLengthOnLevel: number[] = [];
+  const verticalLinePositions: number[] = [];
 
-    maxValuesLengthOnLevel.push(value);
+  // Получаем уникальные уровни
+  const levels = Array.from(new Set(nodes.map((n) => n.level)));
+
+  // Находим максимальную длину значения на каждом уровне
+  for (const level of levels) {
+    const maxLength = nodes
+      .filter((n) => n.level === level)
+      .map((n) => n.value.length)
+      .sort((a, b) => b - a)[0];
+    maxValuesLengthOnLevel.push(maxLength);
   }
 
-  // Формируем данные по каждому узлу
   for (let i = 0; i < nodes.length; i++) {
-    let template = ""; // Шаблон для узла, имеющего дочерние элементы
-    const node = nodes[i]; // Текущий узел
-    const nodesOnThisLevel = nodes.filter((item) => item.level === node.level); // Все узлы на данном уровне вложенности
-    const valueLengthsSum = maxValuesLengthOnLevel
+    const node = nodes[i];
+    const nodesOnLevel = nodes.filter((n) => n.level === node.level);
+
+    const offset = maxValuesLengthOnLevel
       .slice(0, node.level)
-      .reduce((a, b) => a + b, 0); // Сумма максимальных длин символов ДО текущего уровня вложенности (используется для создания отступов)
+      .reduce((sum, len) => sum + len, 0);
 
-    // Если у узла есть дочерние элементы, добавляем в шаблон строку (n*"-")---+
-    if (nodes[i + 1] && node.level < nodes[i + 1].level) {
-      const lastLength = maxValuesLengthOnLevel[node.level];
-      template = "-".repeat(lastLength - node.value.length) + "---+";
+    let connector = '';
+    const isParent = nodes[i + 1] && node.level < nodes[i + 1].level;
+    if (isParent) {
+      const padding = maxValuesLengthOnLevel[node.level] - node.value.length;
+      connector = '-'.repeat(padding) + '---+';
     }
 
-    // Создаем значение строки по текущему узлу (отступы + значение + шаблон)
-    let treeValue =
-      " ".repeat(node.level * 3 + valueLengthsSum) + node.value + template;
+    let treeLine = ' '.repeat(node.level * 3 + offset) + node.value + connector;
 
-    // Добавляем в строку вертикальные линии
-    for (const position of verticalLinePositions) {
-      treeValue =
-        treeValue.slice(0, position) + "|" + treeValue.slice(position + 1);
-    }
-
-    // Если на данном уровне есть еще элементы и уровень вложенности следующего элемента больше
-    if (
-      nodesOnThisLevel.length !== 1 &&
-      nodes[i + 1] &&
-      node.index !== nodesOnThisLevel.at(-1).index &&
-      node.level < nodes[i + 1].level
-    ) {
-      // Находим индекс следующего узла на данном уровне
-      const nextNodeIndex =
-        nodesOnThisLevel.findIndex((item) => item.index === node.index) + 1;
-      // Берем массив узлов от текущего индекса до индекса следующего узла на данном уровне
-      const nodesBetweenIndex = nodes.slice(
-        node.index,
-        nodesOnThisLevel[nextNodeIndex].index
-      );
-
-      let validLevels = true; // Валидность уровней узлов
-
-      // Если хотя бы один узел имеет уровень вложенности меньше текущего, то валидность уровне устанавливается в false
-      for (const nodeBI of nodesBetweenIndex) {
-        if (nodeBI.level < node.level) validLevels = false;
-      }
-
-      // Если валидность уровней узлов true, то добавляем новую позицию для | в массив verticalLinePositions
-      if (validLevels) {
-        verticalLinePositions.push(node.level * 3 + valueLengthsSum);
+    for (const pos of verticalLinePositions) {
+      if (pos < treeLine.length) {
+        treeLine = treeLine.substring(0, pos) + '|' + treeLine.substring(pos + 1);
       }
     }
 
-    // Если уровень вложенности будет уменьшаться, убираем последнюю позицию для вертикальной линии
+    // Проверка, нужно ли добавить вертикальную линию
+    const isBranching =
+      nodesOnLevel.length > 1 &&
+      isParent &&
+      node.index !== nodesOnLevel.at(-1)?.index;
+
+    if (isBranching) {
+      const nextSibling = nodesOnLevel.find((n) => n.index > node.index);
+      if (nextSibling) {
+        const inBetweenNodes = nodes.slice(node.index, nextSibling.index);
+        const allDeeper = inBetweenNodes.every((n) => n.level >= node.level);
+
+        if (allDeeper) {
+          verticalLinePositions.push(node.level * 3 + offset);
+        }
+      }
+    }
+
     if (nodes[i + 1] && node.level > nodes[i + 1].level) {
       verticalLinePositions.pop();
     }
 
-    // Добавляем конечную строку к дереву
-    tree += `<pre>${treeValue}</pre>`;
+    tree += `<pre>${treeLine}</pre>`;
   }
 
   return tree;
