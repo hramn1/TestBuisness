@@ -1,2 +1,4 @@
-# plan-room
-plan-room
+# Для инициализации требуется Node 20
+# npm i установка зависимостей
+# npm start запуск проекта
+# npm run build сборка проекта
