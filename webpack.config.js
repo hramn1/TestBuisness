@@ -27,7 +27,7 @@ module.exports = {
         extensions: ['.ts', '.js'],
         alias: {
           "@": path.resolve(__dirname, 'src/'),
-          "@component": path.resolve(__dirname, 'src/component/'),
+          "@components": path.resolve(__dirname, 'src/components/'),
         },
     },
 };
