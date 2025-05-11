@@ -1,7 +1,68 @@
+*, *:before, *:after {
+  box-sizing: border-box;
+}
 .validate-error{
   color:red;
   display: none;
 }
 .validate-error--show{
   display: block;
+  grid-row: 2 / -1;
+  grid-column: 1 / -1;
+}
+.main{
+  padding: 20px;
+  display: grid;
+  height: 100vh;
+  grid-template-columns: auto;
+  grid-template-rows: auto auto 1fr;
+}
+.main__title{
+  text-align: center;
+}
+.form-tree{
+  display: grid;
+  width: 60%;
+  min-width: 800px;
+  margin: 0 auto;
+  grid-template-columns: auto 1fr auto;
+  grid-template-rows: auto auto ;
+  gap: 10px;
+}
+.form-tree__input{
+  padding:  5px 10px;
+  border-radius: 5px;
+  border: 1px solid gray;
+}
+.form-tree__input::placeholder{
+  color: gray;
+}
+.form-tree__label{
+  align-self: center;
+}
+.form-tree__btn{
+  padding:  5px 10px;
+  border-radius: 5px;
+  border: 1px solid gray;
+  color: white;
+  background-color: #0e750e;
+  cursor: pointer;
+}
+.form-tree__btn:hover{
+  background-color: #0b9d0b;
+}
+.form-tree__btn:disabled{
+  opacity: 0.2;
+  cursor: not-allowed;
+}
+.green-item {
+  color: #0e750e
+}
+.blue-item {
+  color: #0d0dcc;
+}
+.render-tree{
+  width: 60%;
+  min-width: 800px;
+  margin: 0 auto;
 }

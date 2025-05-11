@@ -9,40 +9,60 @@ interface IApp {
 export class App implements IApp {
   form: HTMLFormElement;
   sectionRender: HTMLDivElement;
-  input: Element | null;
+  input: HTMLInputElement | null;
+  validateError: HTMLParagraphElement | null;
   constructor(form: HTMLFormElement, sectionRender: HTMLDivElement) {
     this.form = form;
     this.sectionRender = sectionRender;
     this.input = form.querySelector('.form-tree__input');
+    this.validateError = document.querySelector('.validate-error');
   }
   inputValue(){
-    const validateError = document.querySelector('.validate-error')
+    if(this.input) {
+      this.input.value = ''
+    }
     this.input?.addEventListener('change', (evt) => {
       const target = evt.target as HTMLInputElement;
       if(!this.validate(target.value)){
-        validateError?.classList.add('validate-error--show');
+        this.validateError?.classList.add('validate-error--show');
+        this.form.querySelector('.form-tree__btn')?.setAttribute('disabled', 'disabled');
       } else {
-        validateError?.classList.remove('validate-error--show');
+        this.validateError?.classList.remove('validate-error--show');
+        this.form.querySelector('.form-tree__btn')?.removeAttribute('disabled');
       }
     })
   }
   validate(str: string): boolean {
-      let depth = 0;
+    if (str[0] !== '(') {
+      return this.setError('Первый символ должен быть открывающей скобкой');
+    }
 
-      for (const char of str) {
-        if (char === '(') {
-          depth++;
-        } else if (char === ')') {
-          depth--;
-          if (depth < 0) {
-            // Закрывающая скобка раньше, чем открывающая
-            return false;
-          }
+    let depth = 0;
+    for (const char of str) {
+      if (char === '(') {
+        depth++;
+      } else if (char === ')') {
+        depth--;
+        if (depth < 0) {
+          return this.setError('Не отбалансированы открывающие и закрывающие скобки');
         }
       }
-
-      return depth === 0; // Все скобки сбалансированы
     }
+
+    const isBalanced = depth === 0;
+    if (!isBalanced) {
+      this.setError('Количество открывающих и закрывающих скобок не совпадает');
+    }
+
+    return isBalanced;
+  }
+
+  private setError(message: string): false {
+    if (this.validateError) {
+      this.validateError.textContent = message;
+    }
+    return false;
+  }
   init() {
     let nodes = null
     this.inputValue();

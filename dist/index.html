@@ -12,12 +12,12 @@
 </head>
 
 <body class="page">
-  <main >
-    <h1>Дерево компонентов</h1>
-    <section>
+  <main class="main" >
+    <h1 class="main__title">Дерево компонентов</h1>
+    <section class="section-form">
       <form class="form-tree"  method="post">
-        <label for="tree">Введите данные для дереве</label>
-        <input class="form-tree__input" name="tree" id="tree" type="text">
+        <label class="form-tree__label" for="tree">Введите данные для дерева</label>
+        <input class="form-tree__input" placeholder="Данные для дерева" required  name="tree" id="tree" type="text">
         <p class="validate-error">Не отбалансированы открывающие и закрывающие скобки</p>
         <button class="form-tree__btn">Отрисовать</button>
       </form>

@@ -31,8 +31,7 @@ export class Tree {
       if (nodes[i + 1] && node.level > nodes[i + 1].level) {
         verticalLinePositions.pop();
       }
-
-      tree += `<pre>${treeLine}</pre>`;
+      tree += `<pre class="${connector ? 'green-item' : 'blue-item'} ">${treeLine}</pre>`;
     }
 
     return tree;
